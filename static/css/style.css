@@ -1,0 +1,34 @@
+.nav-wrapper{
+    background:#fff;
+}
+.nav-wrapper a span {
+    color:#4285f4; 
+    vertical-align: top;
+    font-weight: 300;
+    font-family: 'Indie Flower', cursive;
+
+}
+.nav-content{ 
+    background:#4285f4;
+}
+.brand-logo img{
+    height:65px; 
+}
+
+.zoom { 
+    transition: transform .2s;  
+} 
+.zoom:hover {
+    transform: scale(1.2);
+}
+.tab-content-banner{
+    margin-top:5%;
+}
+
+.canvasjs-chart-credit{
+    display: none;
+}
+
+ 
+
+ 
