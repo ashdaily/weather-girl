@@ -5,7 +5,8 @@
     color:#4285f4; 
     vertical-align: top;
     font-weight: 300;
-    font-family: 'Indie Flower', cursive;
+    font-family: Roboto;
+     
 
 }
 .nav-content{ 
@@ -28,6 +29,43 @@
 .canvasjs-chart-credit{
     display: none;
 }
+
+#myChart{
+    height:400px;
+    width: auto;
+}
+.weather-today{
+    padding:0 2%;
+}
+.weather-today h3{
+    color:#888; 
+}
+.weather-today h5{
+    color:#888;
+}
+
+.weather-today .active{
+    color:#4283fc; 
+}
+/*.active::before{*/
+    /*content: "\00b0";*/
+/*}*/
+#temp-options span:nth-child(n+2){
+    display: inline-block;
+    width: 80px;
+}
+#temp-options span:nth-child(n+2):hover{
+    color:#888;
+}
+#temperature{
+    display: inline-block;
+    width:150px;
+}
+ 
+#temp-options span{
+    cursor: pointer;
+}
+
 
  
 

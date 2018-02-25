@@ -28,6 +28,9 @@ def index(request):
 
 
 
+ 
+
+
 def weather_today(request):
     g = GeoIP2()
     # ip = request.META.get("REMOTE_ADDR", None)
@@ -38,22 +41,24 @@ def weather_today(request):
     else:
         city = "Tokyo"
     print city
-    weather = requests.get(
+    weather_forecast = requests.get(
         "http://api.openweathermap.org/data/2.5/forecast?q="+"bangalore"+"&APPID=f2f33dbceea19eef373a3972938b7cb1")
-    api_data = weather.json()
+    data_weather_forecast = weather_forecast.json()
+     
 
     temp = []
     humidity = []
     wind = []
     label = []
     pressure = []
-    for index, item in enumerate(api_data["list"][0:6]):
-        print index
-        label.append(item["dt_txt"] + " ," + item["weather"][0]["description"])
-
+    for item in data_weather_forecast["list"][0:5]:
+        label.append(item["dt_txt"][11:13]+ " ," + item["weather"][0]["description"])
+        
         humidity.append(item["main"]["humidity"])
         wind.append(item["wind"]["speed"])
         pressure.append(item["main"]["pressure"])
-        temp.append(pytemperature.k2c(item["main"]["temp"]))
+        temp.append(item["main"]["temp"]-273.15)
+    print label
+    print temp
     
     return JsonResponse({'status': 'True','label':label,'temp':temp,"wind":wind,"pressure":pressure,"humidity":humidity})

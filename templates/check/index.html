@@ -4,22 +4,13 @@
 
   <nav class="nav-extended">
     <div class="nav-wrapper">
-{#      <a href="#" class="brand-logo"><i class="material-icons">cloud</i>Weather Girl</a>#}
+ 
         <a href="#" class="brand-logo">
             <img class="zoom"src="{% static "images/cloud.gif" %}"/>
-            <span>weather girl</span>
+            <span>Weather Forecast</span>
         </a>
       <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-{#      <ul id="nav-mobile" class="right hide-on-med-and-down">#}
-{#        <li><a href="sass.html">Sass</a></li>#}
-{#        <li><a href="badges.html">Components</a></li>#}
-{#        <li><a href="collapsible.html">JavaScript</a></li>#}
-{#      </ul>#}
-{#      <ul class="side-nav" id="mobile-demo">#}
-{#        <li><a href="sass.html">Sass</a></li>#}
-{#        <li><a href="badges.html">Components</a></li>#}
-{#        <li><a href="collapsible.html">JavaScript</a></li>#}
-{#      </ul>#}
+ 
     </div>
 
       
@@ -35,37 +26,25 @@
 
   <div id="test1" class="col s12 tab-content-banner">
     <div class="container ">
-        <div class="row">
-            <div class="col s10 offset-s1">
                 <div class="card">
-
-                    <canvas id="myChart"  height="200"></canvas>
-                    
-                    <div class="card-content">
-                        <ul class="collection with-header">
-                            <li class="collection-header"><h4>Weather in {{ city }} : 40 &deg; C</h4></li>
-                            <li class="collection-item">Wind	Strong breeze, 11.6 m/h, ( 354.508 )</li>
-                            <li class="collection-item">Your co-ordinates : [35.69, 139.69] </li>
-                            <li class="collection-item">Sunise : 02:52, Sunset : 02:52</li>
-                            <li class="collection-item">Humidity : 96 %</li>
-                        </ul>
+                    <div class="weather-today">
+                        <div class="row">
+                            <div class="col s12 ">
+                                <h3 id="place"></h3>
+                                <h5 id="datetime"></h5>
+                                <h5 id="weather-detail"></h5>
+                                <h1 id="temp-options"><span id="temperature"></span><span onClick="k2c()" id="celcius">&deg;C</span> <span id="fahrenheit" onClick="k2f()">&deg;F</span> <span onClick="k2k()" id="kelvin">&deg;K</span></h1>
+                                <h5>Humidity : <span id="humidity"></span>, Wind : <span id="wind"></span>, Pressure : <span id="pressure"></span> </h5>
+                            </div>
+                        </div>
                     </div>
-{#                    <div class="card-tabs">#}
-{#                      <ul class="tabs tabs-fixed-width">#}
-{#                        <li class="tab"><a href="#test4">Test 1</a></li>#}
-{#                        <li class="tab"><a class="active" href="#test5">Test 2</a></li>#}
-{#                        <li class="tab"><a href="#test6">Test 3</a></li>#}
-{#                      </ul>#}
-{#                    </div>#}
-{#                    <div class="card-content grey lighten-4">#}
-{#                      <div id="test4">Test 1</div>#}
-{#                      <div id="test5">Test 2</div>#}
-{#                      <div id="test6">Test 3</div>#}
-{#                    </div>#}
-
+                    
                 </div>
-            </div>
-        </div>
+                <div class="card">  
+                    <canvas id="myChart"></canvas> 
+                </div>
+
+         
     </div>
 
 
@@ -89,98 +68,146 @@
 
 
 {% block javascript %} 
-    <script src="http://www.chartjs.org/dist/2.7.1/Chart.bundle.js"></script>
-    <script src="http://www.chartjs.org/samples/latest/utils.js"></script>
+     
+     
     <script>
+
     function getTodaysWeather(){
+
+    $.getJSON('//freegeoip.net/json/?callback=?', function(remote) {
+        console.log(remote);
+      $.get("http://api.openweathermap.org/data/2.5/weather?lat="+remote["latitude"]+"&lon="+remote["longitude"]+"&APPID=f2f33dbceea19eef373a3972938b7cb1", function(data, status) {
+          var date = new Date(); //  sets the date to the epoch
+
+          $("#place").text(remote["city"]+", "+remote["region_code"]+", "+remote["country_name"]);
+          $("#datetime").text(date);
+           
+          $("#weather-detail").text(capitalizeFirstLetter(data["weather"][0]["description"]));
+          $("#temperature").text(Math.round(data["main"]["temp"]-273.15));
+          $("#celcius").addClass("active");
+          localStorage.setItem("kelvin",data["main"]["temp"]);
+           
+           
+          $("#humidity").text(data["main"]["humidity"]+"%");
+          $("#wind").text(data["wind"]["speed"]+" m/s");
+          $("#pressure").text(data["main"]["pressure"]+" hpa");
+
+
+          
+       }
+      );
+    });
 
     var hostname = document.origin+"{% url "check:weather_today" %}";
         console.log("calling the server for weather update of today");
         $.get(hostname, function(data, status){
             console.log(data)
             console.log(status)
-
-
-        var lineChartData = {
-        labels: data["label"],
-        datasets: [{
-            label: "Wind Speed",
-            borderColor: window.chartColors.red,
-            backgroundColor: window.chartColors.red,
-            fill: false,
-            data: data["wind"],
-            yAxisID: "y-axis-1",
-        }, {
-            label: "Temperature",
-            borderColor: window.chartColors.blue,
-            backgroundColor: window.chartColors.blue,
-            fill: false,
-            data: data["temp"],
-            yAxisID: "y-axis-2"
-        },
-            {
-            label: "Humidity",
-            borderColor: window.chartColors.green,
-            backgroundColor: window.chartColors.green,
-            fill: false,
-            data: data["humidity"],
-            yAxisID: "y-axis-3"
-        }
-
-        ]
-    };
-
-    window.onload = function() {
-        var ctx = document.getElementById("myChart").getContext("2d");
-        window.myLine = Chart.Line(ctx, {
-            data: lineChartData,
-            options: {
-                responsive: true,
-                hoverMode: 'index',
-                stacked: false,
-                title:{
-                    display: true,
-                    text:'Chart.js Line Chart - Multi Axis'
+            if (status = "success"){
+                var lineChartData = {
+                labels: data["label"],
+                datasets: [{
+                    label: "Wind Speed",
+                    borderColor: window.chartColors.blue,
+                    backgroundColor: window.chartColors.blue,
+                    fill: false,
+                    data: data["wind"],
+                    yAxisID: "y-axis-1",
+                }, {
+                    label: "Temperature",
+                    borderColor: window.chartColors.orange,
+                    backgroundColor: window.chartColors.orange,
+                    fill: false,
+                    data: data["temp"],
+                    yAxisID: "y-axis-2"
                 },
-                scales: {
-                    yAxes: [{
-                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                        display: true,
-                        position: "left",
-                        id: "y-axis-1",
-                    }, {
-                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                        display: true,
-                        position: "right",
-                        id: "y-axis-2",
-
-                        // grid line settings
-                        gridLines: {
-                            drawOnChartArea: false, // only want the grid lines for one axis to show up
-                        },
-                    },
                     {
-                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                        display: true,
-                        position: "right",
-                        id: "y-axis-3",
-
-                        // grid line settings
-                        gridLines: {
-                            drawOnChartArea: false, // only want the grid lines for one axis to show up
-                        },
-                    }],
+                    label: "Humidity",
+                    borderColor: window.chartColors.grey,
+                    backgroundColor: window.chartColors.grey,
+                    fill: false,
+                    data: data["humidity"],
+                    yAxisID: "y-axis-3"
                 }
+
+                ]
+            };
+                
+                var ctx = document.getElementById("myChart").getContext("2d");
+                window.myLine = Chart.Line(ctx, {
+                    data: lineChartData,
+                    options: {
+                        responsive: true,
+                        hoverMode: 'index',
+                        stacked: false,
+                        title:{
+                            display: true,
+                            text:'Weather forecast '
+                        },
+                        scales: {
+                            yAxes: [{
+                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                display: true,
+                                position: "left",
+                                id: "y-axis-1",
+                            }, {
+                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                display: true,
+                                position: "right",
+                                id: "y-axis-2",
+
+                                // grid line settings
+                                gridLines: {
+                                    drawOnChartArea: false, // only want the grid lines for one axis to show up
+                                },
+                            },
+                            {
+                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                display: true,
+                                position: "right",
+                                id: "y-axis-3",
+
+                                // grid line settings
+                                gridLines: {
+                                    drawOnChartArea: false, // only want the grid lines for one axis to show up
+                                },
+                            }],
+                        }
+                    }
+                });
+
+            }else{
+                alert("something went wrong");
             }
-        });
-    };
+
+
+
+
 
      // end of chart js instance
      });
 
  }
-
+ 
  getTodaysWeather()
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+ }
+function k2c(){ 
+    $("#temperature").text(Math.round(localStorage.getItem("kelvin")-273.15)).find("span");
+    $("#temp-options").find("span").removeClass("active");
+    $("#celcius").addClass("active");
+}
+function k2f(){ 
+    $("#temperature").text(Math.round((localStorage.getItem("kelvin")*5/9)-273.15));
+    $("#temp-options").find("span").removeClass("active");
+    $("#fahrenheit").addClass("active");
+}
+function k2k(){
+    $("#temperature").text(Math.round(localStorage.getItem("kelvin"))).addClass("active");
+    $("#temp-options").find("span").removeClass("active");
+    $("#kelvin").addClass("active");
+}
     </script>
 
 {% endblock javascript %} 
