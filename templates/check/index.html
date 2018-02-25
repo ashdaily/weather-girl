@@ -10,16 +10,16 @@
             <span>weather girl</span>
         </a>
       <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-      <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="sass.html">Sass</a></li>
-        <li><a href="badges.html">Components</a></li>
-        <li><a href="collapsible.html">JavaScript</a></li>
-      </ul>
-      <ul class="side-nav" id="mobile-demo">
-        <li><a href="sass.html">Sass</a></li>
-        <li><a href="badges.html">Components</a></li>
-        <li><a href="collapsible.html">JavaScript</a></li>
-      </ul>
+{#      <ul id="nav-mobile" class="right hide-on-med-and-down">#}
+{#        <li><a href="sass.html">Sass</a></li>#}
+{#        <li><a href="badges.html">Components</a></li>#}
+{#        <li><a href="collapsible.html">JavaScript</a></li>#}
+{#      </ul>#}
+{#      <ul class="side-nav" id="mobile-demo">#}
+{#        <li><a href="sass.html">Sass</a></li>#}
+{#        <li><a href="badges.html">Components</a></li>#}
+{#        <li><a href="collapsible.html">JavaScript</a></li>#}
+{#      </ul>#}
     </div>
 
       
@@ -39,8 +39,8 @@
             <div class="col s10 offset-s1">
                 <div class="card">
 
-                    <div id="chartContainer" style="height: 300px; width: 100%;">
-                    </div>
+                    <canvas id="myChart"  height="200"></canvas>
+                    
                     <div class="card-content">
                         <ul class="collection with-header">
                             <li class="collection-header"><h4>Weather in {{ city }} : 40 &deg; C</h4></li>
@@ -63,7 +63,7 @@
 {#                      <div id="test6">Test 3</div>#}
 {#                    </div>#}
 
-                  </div>
+                </div>
             </div>
         </div>
     </div>
@@ -88,55 +88,99 @@
 
 
 
-{% block javascript %}
+{% block javascript %} 
+    <script src="http://www.chartjs.org/dist/2.7.1/Chart.bundle.js"></script>
+    <script src="http://www.chartjs.org/samples/latest/utils.js"></script>
+    <script>
+    function getTodaysWeather(){
+
+    var hostname = document.origin+"{% url "check:weather_today" %}";
+        console.log("calling the server for weather update of today");
+        $.get(hostname, function(data, status){
+            console.log(data)
+            console.log(status)
 
 
-      <script type="text/javascript">
-  window.onload = function () {
-    var chart = new CanvasJS.Chart("chartContainer",
-    {
-      title: {
-        text: "Monthly Downloads",
-        fontSize: 25
-      },
-      axisX:{
-        valueFormatString: "MMM" ,
-        interval: 1,
-        intervalType: "weekly"
+        var lineChartData = {
+        labels: data["label"],
+        datasets: [{
+            label: "Wind Speed",
+            borderColor: window.chartColors.red,
+            backgroundColor: window.chartColors.red,
+            fill: false,
+            data: data["wind"],
+            yAxisID: "y-axis-1",
+        }, {
+            label: "Temperature",
+            borderColor: window.chartColors.blue,
+            backgroundColor: window.chartColors.blue,
+            fill: false,
+            data: data["temp"],
+            yAxisID: "y-axis-2"
+        },
+            {
+            label: "Humidity",
+            borderColor: window.chartColors.green,
+            backgroundColor: window.chartColors.green,
+            fill: false,
+            data: data["humidity"],
+            yAxisID: "y-axis-3"
+        }
 
-      },
-      axisY: {
-        title: "Temperature"
-      },
-
-      data: [
-      {
-        indexLabelFontColor: "red",
-        type: "area",
-        dataPoints: [//array
-
-        { x: "sunday", y: 2600},
-        { x: new Date(2012, 01, 1), y: 3800 },
-        { x: new Date(2012, 02, 1), y: 4300 },
-        { x: new Date(2012, 03, 1), y: 2900 },
-        { x: new Date(2012, 04, 1), y: 4100 },
-        { x: new Date(2012, 05, 1), y: 4500 },
-        { x: new Date(2012, 06, 1), y: 8600,  indexLabel: "Highest" },
-        { x: new Date(2012, 07, 1), y: 6400 },
-        { x: new Date(2012, 08, 1), y: 5300 },
-        { x: new Date(2012, 09, 1), y: 6000}
         ]
-      }
-      ]
-    });
+    };
 
-    chart.render();
-  }
-  </script>
-  <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    window.onload = function() {
+        var ctx = document.getElementById("myChart").getContext("2d");
+        window.myLine = Chart.Line(ctx, {
+            data: lineChartData,
+            options: {
+                responsive: true,
+                hoverMode: 'index',
+                stacked: false,
+                title:{
+                    display: true,
+                    text:'Chart.js Line Chart - Multi Axis'
+                },
+                scales: {
+                    yAxes: [{
+                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                        display: true,
+                        position: "left",
+                        id: "y-axis-1",
+                    }, {
+                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                        display: true,
+                        position: "right",
+                        id: "y-axis-2",
 
+                        // grid line settings
+                        gridLines: {
+                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        },
+                    },
+                    {
+                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                        display: true,
+                        position: "right",
+                        id: "y-axis-3",
 
+                        // grid line settings
+                        gridLines: {
+                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                        },
+                    }],
+                }
+            }
+        });
+    };
 
+     // end of chart js instance
+     });
 
+ }
+
+ getTodaysWeather()
+    </script>
 
 {% endblock javascript %} 
