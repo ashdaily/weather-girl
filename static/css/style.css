@@ -1,19 +1,20 @@
 .nav-wrapper{
     background:#fff;
 }
-.nav-wrapper a span {
+.nav-wrapper span {
+    display: inline-block;
     color:#4285f4; 
-    vertical-align: top;
+    vertical-align: text-bottom;
     font-weight: 300;
     font-family: Roboto;
-     
-
+    font-size: 2.2rem;
+    height:70px;  
 }
 .nav-content{ 
     background:#4285f4;
 }
-.brand-logo img{
-    height:65px; 
+.nav-wrapper img{
+    height:70px;
 }
 
 .zoom { 
@@ -50,23 +51,88 @@
 /*.active::before{*/
     /*content: "\00b0";*/
 /*}*/
-#temp-options span:nth-child(n+2){
+
+
+
+.loader {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
     display: inline-block;
-    width: 80px;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    margin-top: -60px;
+    margin-left: -60px;
 }
-#temp-options span:nth-child(n+2):hover{
+#loader{
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
+    top:0;
+    left:0;
+    bottom: 0;
+    background: #fff;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.updates-card{
+    padding:5%;
+}
+.updates-card h3,.updates-card p{
     color:#888;
-}
-#temperature{
-    display: inline-block;
-    width:150px;
-}
- 
-#temp-options span{
-    cursor: pointer;
+    text-align: center;
 }
 
+ #temp-options span{
+        cursor: pointer;
+ }
+ #temp-options span:nth-child(n+2):hover{
+        color:#888;
+ }
 
- 
 
+
+/* only mobile screen */
+@media screen and (max-width: 600px){
+    #temp-options span:nth-child(n+2){
+        display: inline-block;
+        width: 45px;
+    }
+    
+    #temperature{
+        display: inline-block;
+        width:120px;
+    }
+    #search-weather{
+        height: 4rem;
+    }
+    .chartjs-card{
+        display:none;
+    } 
+}
+
+/* small tablets and above*/
+@media screen and (min-width: 601px){
+    #temp-options span:nth-child(n+2){
+        display: inline-block;
+        width: 80px;
+    }
+    #temp-options span:nth-child(n+2):hover{
+        color:#888;
+    }
+    #temperature{
+        display: inline-block;
+        width:150px;
+    }
+    
+}
  
